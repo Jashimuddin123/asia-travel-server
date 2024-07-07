@@ -1,30 +1,14 @@
-const exprees  = require('express');
+const express = require('express');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const cors = require('cors');
-const app = exprees()
-require('dotenv').config()
-const port = process.env.PORT || 5000
+require('dotenv').config();
 
-// midleware 
+const app = express();
+const port = process.env.PORT || 5000;
+
+// Middleware
 app.use(cors());
-app.use(exprees.json())
-
-// GET METHOD
-app.get('/', (req, res) => {
-    res.send('Server is running');
-  });
-  
-  app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-  });
-
-//   asian-traveler
-// HIbIPz3ZOB8Caf3X
-
-// mongodb+srv://asian-traveler:<password>@cluster0.3tcc9mo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-
-
-// connect with mongofb database
+app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.3tcc9mo.mongodb.net/?appName=Cluster0`;
 console.log(uri);
@@ -35,21 +19,47 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+  },
 });
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
+    // Connect the client to the server
     await client.connect();
 
-    
+    // Set user collection
+    const addCollection = client.db('addTourist').collection('add');
+       
+    // Post method
+    app.post('/touristSpots', async (req, res) => {
+      const newAdd = req.body;
+      console.log(newAdd);
+      const result = await addCollection.insertOne(newAdd);
+      res.send(result);
+    });
+
+    //  get method  for touris sport
+    app.get('/touristSpots' , async (req, res)=>{
+      const cursor = addCollection.find()
+      const result = await cursor.toArray()
+      res.send(result)
+  })
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
+  } catch (error) {
+    console.error("Error connecting to MongoDB", error);
   }
 }
+
 run().catch(console.dir);
+
+// GET METHOD
+app.get('/', (req, res) => {
+  res.send('Server is running');
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
