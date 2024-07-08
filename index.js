@@ -61,6 +61,36 @@ async function run() {
     const result = await addCollection.findOne(filter);
     res.send(result)
   }) 
+  // delete method
+  app.delete('/touristSpots/:id', async(req, res)=>{
+    const id = req.params.id;
+    const query = {_id: new ObjectId(id)}
+    const result = await addCollection.deleteOne(query);
+    res.send(result)
+  } )
+// update method using put
+app.put('/touristSpots/:id', async (req, res) => {
+  const id = req.params.id;
+  const body = req.body;
+  const filter = { _id: new ObjectId(id) };
+  const option = { upsert: true };
+  const updateDoc = {
+      $set: {
+          tourist_spot_name: body.tourist_spot_name,
+          country_name: body.country_name,
+          location: body.location,
+          average_cost: body.average_cost,
+          seasonality: body.seasonality,
+          photo_url: body.photo_url,
+          travel_time: body.travel_time,
+          total_visitors: body.total_visitors,
+          short_description: body.short_description,
+      },
+  };
+  const result = await addCollection.updateOne(filter, updateDoc, option);
+  res.send(result);
+});
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
