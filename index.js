@@ -32,6 +32,7 @@ async function run() {
        
     // Post method
     app.post('/touristSpots', async (req, res) => {
+    console.log(req.query.email);
       const newAdd = req.body;
       console.log(newAdd);
       const result = await addCollection.insertOne(newAdd);
@@ -44,6 +45,7 @@ async function run() {
       const result = await cursor.toArray()
       res.send(result)
   })
+
     
   // get method by _id
   app.get("/touristSpots/:id", async(req, res)=>{
