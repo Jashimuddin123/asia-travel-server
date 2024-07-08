@@ -32,7 +32,7 @@ async function run() {
        
     // Post method
     app.post('/touristSpots', async (req, res) => {
-    console.log(req.query.email);
+
       const newAdd = req.body;
       console.log(newAdd);
       const result = await addCollection.insertOne(newAdd);
@@ -41,9 +41,15 @@ async function run() {
 
     //  get method  for touris sport
     app.get('/touristSpots' , async (req, res)=>{
+      const queryEmail = req.query.email;
+      if(queryEmail){
+        const filter = {email:queryEmail};
+        const result = await addCollection.find(filter).toArray()
+        return res.send(result)
+      }
       const cursor = addCollection.find()
       const result = await cursor.toArray()
-      res.send(result)
+      return res.send(result)
   })
 
     
